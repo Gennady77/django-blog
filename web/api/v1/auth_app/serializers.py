@@ -20,10 +20,10 @@ class UserSignUpSerializer(serializers.Serializer):
     first_name = serializers.CharField(min_length=2, max_length=100)
     last_name = serializers.CharField(min_length=2, max_length=100)
     email = serializers.EmailField()
-    password_1 = serializers.CharField(write_only=True, min_length=8)
-    password_2 = serializers.CharField(write_only=True, min_length=8)
+    password_1 = serializers.CharField(write_only=True, min_length=5)
+    password_2 = serializers.CharField(write_only=True, min_length=5)
 
-    def validate_password1(self, password: str):
+    def validate_password_1(self, password: str):
         validate_password(password)
         return password
 

@@ -68,7 +68,7 @@ class AuthAppService:
     @transaction.atomic()
     def create_user(self, validated_data: dict):
         data = CreateUserData(**validated_data)
-        print(f'{data=}')
+        User.objects.create_user(data.email, data.password_1)
         return User
 
 

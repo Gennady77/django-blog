@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from django.core.mail import send_mail
 
 from . import serializers
 from .services import AuthAppService, full_logout
@@ -18,8 +19,17 @@ class SignUpView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        service = AuthAppService()
-        service.create_user(serializer.validated_data)
+        # service = AuthAppService()
+        # user = service.create_user(serializer.validated_data)
+        
+        send_mail(
+					'confirmation of registration',
+					'confirm your registration',
+          'asd@asd.com',
+          ['qwerty@asd.com'],
+          fail_silently=False
+				)
+
         return Response(
             {'detail': _('Confirmation email has been sent')},
             status=status.HTTP_201_CREATED,

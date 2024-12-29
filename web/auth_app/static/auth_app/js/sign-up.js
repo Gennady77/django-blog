@@ -6,5 +6,17 @@ $(function () {
 function singUp(e) {
   let form = $(this);
   e.preventDefault();
-  console.log('here')
+
+	$.ajax({
+    url: form.attr("action"),
+    type: "POST",
+    dataType: 'json',
+    data: form.serialize(),
+    success: function (data) {
+      location.reload();
+    },
+    error: function (data) {
+      console.error(data);
+    }
+	});
 }
