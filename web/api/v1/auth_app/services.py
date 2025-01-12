@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, NamedTuple
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
+from django.core import signing
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
@@ -66,11 +67,19 @@ class AuthAppService:
         return User.objects.get(email=email)
 
     @transaction.atomic()
-    def create_user(self, validated_data: dict):
+    def create_user(self, validated_data: dict) -> 'User':
         data = CreateUserData(**validated_data)
-        User.objects.create_user(data.email, data.password_1)
-        return User
-
+        user = User.objects.create_user(
+            email=data.email,
+						first_name=data.first_name,
+						last_name=data.last_name,
+						password=data.password_1,
+						is_active=False
+				)
+        return user
+    
+    def get_confrim_url(self, user_id: int):
+      return 'http://localhost:8008/verify-email/%s' % signing.dumps(user_id)
 
 def full_logout(request):
     response = Response({"detail": _("Successfully logged out.")}, status=status.HTTP_200_OK)
