@@ -5,14 +5,11 @@
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
 		<legend>Email confirmation</legend>
-		Hi! To confirm your email press button 'Confirm'
-		<button class="btn btn-lg btn-primary btn-block signup-btn" id="btnConfirm">Confirm</button>
+		Hi! Your email was confirmed!
 	</div>
 </div>
 {% endblock container %}
 
 {% block jquery %}
-$.getScript('{% static 'auth_app/js/verify-email.js' %}', () => {
-	init('{{ confirm_key }}', '{% url 'api:v1:auth_app:sign-up-verify' %}');
-});
+$.getScript('{% static 'auth_app/js/verify-email.js' %}');
 {% endblock %}

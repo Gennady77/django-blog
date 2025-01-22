@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -78,8 +79,29 @@ class AuthAppService:
 				)
         return user
     
+    def confirm_email(self, key: str):
+      try:  
+        user_id = signing.loads(key, max_age=3600)
+
+        user = User.objects.get(id=user_id)
+
+      except (signing.BadSignature, signing.SignatureExpired):
+        raise ValidationError({
+          'error': 'confirm key is not valid or expired'
+        })
+      except User.DoesNotExist:
+        raise ValidationError({
+          'error': 'user does not exist'
+        })
+
+      user.is_active = True
+
+      user.save(update_fields=['is_active'])
+    
     def get_confrim_url(self, user_id: int):
-      return 'http://localhost:8008/verify-email/%s' % signing.dumps(user_id)
+      confirm_key = signing.dumps(user_id)
+
+      return f'{settings.FRONTEND_URL}/verify-email/?confirm_key={confirm_key}'
 
 def full_logout(request):
     response = Response({"detail": _("Successfully logged out.")}, status=status.HTTP_200_OK)

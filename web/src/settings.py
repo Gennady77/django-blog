@@ -34,7 +34,7 @@ INTERNAL_IPS: list[str] = []
 ADMIN_URL = os.environ.get('ADMIN_URL', 'admin')
 
 SWAGGER_URL = os.environ.get('SWAGGER_URL')
-FRONTEND_URL = os.environ.get('FRONTEND_URL')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:8008')
 
 HEALTH_CHECK_URL = os.environ.get('HEALTH_CHECK_URL', '/application/health/')
 EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
