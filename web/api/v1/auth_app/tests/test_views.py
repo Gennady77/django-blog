@@ -1,93 +1,98 @@
-from django.test import TestCase
+from django.core import mail
+from django.test import Client, TestCase
 
+from django.urls import reverse
 from rest_framework import status
 
 from unittest.mock import Mock, patch
 
 from api.v1.auth_app.views import SignUpView
+from main.models import User
+
+import pdb
 
 from ..services import AuthAppService
 
-class Request():
-	def __init__(self):
-		self.data = 'some test data'
+SIGN_UP_URL = reverse('api:v1:auth_app:sign-up')
 
-class Serializer():
-	def __init__(self):
-		self.validated_data = 'some validated data'
-
-	def is_valid(self, raise_exception=False):
-		pass
-
-class UserMock():
-	def __init__(self):
-		self.full_name = 'test full name'
-		self.email = 'test email'
-		self.id = 'test id'
-
-class ResponseMock:
-	def __init__(self, data=None, status=None):
-		self.data = data
-		self.status = status
-
-@patch('api.v1.auth_app.views.Response', new=ResponseMock)
-@patch('api.v1.auth_app.views.send_information_email')
 class ViewsTestCase(TestCase):
 	def setUp(self):
-		self.AuthAppService_patcher = patch('api.v1.auth_app.views.AuthAppService')
-		mock_service_class = self.AuthAppService_patcher.start()
+		self.client = Client()
 
-		self.serviceInstance = mock_service_class.return_value
-		self.serviceInstance.create_user.return_value = UserMock()
-		self.serviceInstance.get_confrim_url.return_value = 'some confirm url'
+	def check_required(self, required_key):
+		correctPostData = {
+			'first_name': 'TestName',
+			'last_name': 'TestLastName',
+			'email': 'test.email@asd.com',
+			'password_1': '12345',
+			'password_2': '12345'
+		}
 
-		self.view = SignUpView()
-		self.mockSerializer = Serializer()
-		self.view.get_serializer = Mock(return_value=self.mockSerializer)
+		del correctPostData[required_key]
 
-		self.request = Request()
+		response = self.client.post(SIGN_UP_URL, correctPostData, content_type='application/json')
 
-	def tearDown(self):
-		self.AuthAppService_patcher.stop()
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertEqual(response.data[required_key][0].code, 'required')
 
-	def test_should_call_get_serializer_with_request_data(self, send_information_email):
-		self.view.post(self.request)
+	def test_with_correct_data(self):
+		correctPostData = {
+			'first_name': 'TestName',
+			'last_name': 'TestLastName',
+			'email': 'test.email@asd.com',
+			'password_1': '12345',
+			'password_2': '12345'
+		}
 
-		self.view.get_serializer.assert_called_once_with(data='some test data')
+		response = self.client.post(reverse('api:v1:auth_app:sign-up'), correctPostData, content_type='application/json')
 
-	def test_should_call_create_user_with_validated_data(self, send_information_email):
-		self.view.post(self.request)
+		testUser = User.objects.get(email='test.email@asd.com')
 
-		self.serviceInstance.create_user.assert_called_with('some validated data')
+		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+		self.assertEqual(len(mail.outbox), 1)
+		self.assertEqual(testUser.full_name, 'TestName TestLastName')
 
-	def test_should_call_confirm_url_with_user_id(self, send_information_email):
-		self.view.post(self.request)
+	def test_first_name_required(self):
+		self.check_required('first_name')
 
-		self.serviceInstance.get_confrim_url.assert_called_once_with('test id')
+	def test_last_name_required(self):
+		self.check_required('last_name')
 
-	def test_should_send_email(self, send_information_email):
-		self.view.post(self.request)
+	def test_email_required(self):
+		self.check_required('email')
 
-		send_information_email.assert_called_with(
-			subject='Confirm your email',
-			template_name='emails/confirmation.html',
-			context={ 'name': 'test full name', 'confirm_url': 'some confirm url' },
-			to_email='test email'
-		)
+	def test_password_1_required(self):
+		self.check_required('password_1')
 
-	def test_should_return_response_with_201_status(self, send_information_email):
-		response = self.view.post(self.request)
+	def test_password_2_required(self):
+		self.check_required('password_1')
 
-		self.assertEqual(response.status, status.HTTP_201_CREATED)
+	def test_unique_email(self):
+		User.objects.create_user(email='test.email@asd.com', password=None)
 
-	def test_should_through_exception_when_is_valid_wrong(self, send_information_email):
-		self.mockSerializer.is_valid = Mock(side_effect = Exception('data is not valid'))
+		correctPostData = {
+			'first_name': 'TestName',
+			'last_name': 'TestLastName',
+			'email': 'test.email@asd.com',
+			'password_1': '12345',
+			'password_2': '12345'
+		}
 
-		with self.assertRaises(Exception) as cm:
-			self.view.post(self.request)
+		response = self.client.post(reverse('api:v1:auth_app:sign-up'), correctPostData, content_type='application/json')
 
-		the_exception = cm.exception
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertEqual(response.data['email'][0].code, 'invalid')
 
-		self.assertEqual(the_exception.args[0], 'data is not valid')
-		self.serviceInstance.create_user.assert_not_called()
-		send_information_email.assert_not_called()
+	def test_pass1_pass2(self):
+		correctPostData = {
+			'first_name': 'TestName',
+			'last_name': 'TestLastName',
+			'email': 'test.email@asd.com',
+			'password_1': '12345',
+			'password_2': '67890'
+		}
+
+		response = self.client.post(reverse('api:v1:auth_app:sign-up'), correctPostData, content_type='application/json')
+
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertEqual(response.data['password_2'][0].code, 'invalid')

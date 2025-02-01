@@ -38,6 +38,7 @@ FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:8008')
 
 HEALTH_CHECK_URL = os.environ.get('HEALTH_CHECK_URL', '/application/health/')
 EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
+EMAIL_CONFIRMATION_EXPIRE_SECONDS = 3600
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 

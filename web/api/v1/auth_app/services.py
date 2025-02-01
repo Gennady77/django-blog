@@ -81,18 +81,23 @@ class AuthAppService:
     
     def confirm_email(self, key: str):
       try:  
-        user_id = signing.loads(key, max_age=3600)
+        user_id = signing.loads(key, max_age=settings.EMAIL_CONFIRMATION_EXPIRE_SECONDS)
 
         user = User.objects.get(id=user_id)
 
+        if (user.is_active is True):
+          raise ValidationError({
+						'error': 'user is already active'
+					}, code='user_is_already_active')
+
       except (signing.BadSignature, signing.SignatureExpired):
         raise ValidationError({
-          'error': 'confirm key is not valid or expired'
-        })
+          'key': 'confirm key is not valid or expired'
+        }, code='invalid')
       except User.DoesNotExist:
         raise ValidationError({
           'error': 'user does not exist'
-        })
+        }, code='user_does_not_exists')
 
       user.is_active = True
 
