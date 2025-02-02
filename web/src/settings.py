@@ -37,7 +37,6 @@ SWAGGER_URL = os.environ.get('SWAGGER_URL')
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:8008')
 
 HEALTH_CHECK_URL = os.environ.get('HEALTH_CHECK_URL', '/application/health/')
-EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 EMAIL_CONFIRMATION_EXPIRE_SECONDS = 3600
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -87,9 +86,7 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': ('dj_rest_auth.jwt_auth.JWTCookieAuthentication',),
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
@@ -137,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': { 'min_length': 5 },
+        'OPTIONS': {'min_length': 5},
     },
 ]
 
