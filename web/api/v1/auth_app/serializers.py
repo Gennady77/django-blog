@@ -53,12 +53,12 @@ class LoginSerializer(serializers.Serializer):
             user = AuthAppService.get_user(email)
             if not user:
                 msg = {'email': error_messages['wrong_credentials']}
-                raise serializers.ValidationError(msg)
+                raise serializers.ValidationError(msg, code='wrong_credentials')
             if not user.is_active:
                 msg = {'email': error_messages['not_active']}
-                raise serializers.ValidationError(msg)
+                raise serializers.ValidationError(msg, code='not_active')
             msg = {'email': error_messages['wrong_credentials']}
-            raise serializers.ValidationError(msg)
+            raise serializers.ValidationError(msg, code='wrong_credentials')
         data['user'] = user
         return data
 

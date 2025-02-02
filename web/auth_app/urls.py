@@ -14,5 +14,7 @@ urlpatterns = [
         TemplateAPIView.as_view(template_name='auth_app/reset_password_sent.html'),
         name='reset_email_sent',
     ),
-    path('verify-email/<str:confirm_key>', TemplateView.as_view(template_name='auth_app/verify-email.html'), name='account_verification'),
+    path(
+        'verify-email/', TemplateView.as_view(template_name='auth_app/verify-email.html'), name='account_verification'
+    ),
 ]

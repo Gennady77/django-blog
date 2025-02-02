@@ -1,16 +1,16 @@
 from dj_rest_auth import views as auth_views
 from django.contrib.auth import logout as django_logout
-from django.utils.translation import gettext_lazy as _
 from django.core import signing
+from django.core.mail import send_mail
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from django.core.mail import send_mail
-from main.tasks import send_information_email
 
 from . import serializers
 from .services import AuthAppService, full_logout
+from main.tasks import send_information_email
 
 
 class SignUpView(GenericAPIView):
@@ -23,13 +23,13 @@ class SignUpView(GenericAPIView):
 
         service = AuthAppService()
         user = service.create_user(serializer.validated_data)
-        
+
         send_information_email(
-					subject='Confirm your email',
-					template_name='emails/confirmation.html',
-					context={ 'name': user.full_name, 'confirm_url': service.get_confrim_url(user.id) },
-					to_email=user.email
-				)
+            subject='Confirm your email',
+            template_name='emails/confirmation.html',
+            context={'name': user.full_name, 'confirm_url': service.get_confrim_url(user.id)},
+            to_email=user.email,
+        )
 
         return Response(
             {'detail': _('Confirmation email has been sent')},
@@ -85,8 +85,10 @@ class VerifyEmailView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-        user_id = signing.loads(serializer.validated_data['key'])
+
+        service = AuthAppService()
+
+        service.confirm_email(serializer.validated_data['key'])
 
         return Response(
             {'detail': _('Email verified')},

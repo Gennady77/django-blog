@@ -2,11 +2,12 @@ from typing import TYPE_CHECKING, NamedTuple
 from urllib.parse import urlencode, urljoin
 
 from django.conf import settings
-from django.core import signing
 from django.contrib.auth import get_user_model
+from django.core import signing
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -71,15 +72,36 @@ class AuthAppService:
         data = CreateUserData(**validated_data)
         user = User.objects.create_user(
             email=data.email,
-						first_name=data.first_name,
-						last_name=data.last_name,
-						password=data.password_1,
-						is_active=False
-				)
+            first_name=data.first_name,
+            last_name=data.last_name,
+            password=data.password_1,
+            is_active=False,
+        )
         return user
-    
+
+    def confirm_email(self, key: str):
+        try:
+            user_id = signing.loads(key, max_age=settings.EMAIL_CONFIRMATION_EXPIRE_SECONDS)
+
+            user = User.objects.get(id=user_id)
+
+            if user.is_active is True:
+                raise ValidationError({'error': 'user is already active'}, code='user_is_already_active')
+
+        except (signing.BadSignature, signing.SignatureExpired):
+            raise ValidationError({'key': 'confirm key is not valid or expired'}, code='invalid')
+        except User.DoesNotExist:
+            raise ValidationError({'error': 'user does not exist'}, code='user_does_not_exists')
+
+        user.is_active = True
+
+        user.save(update_fields=['is_active'])
+
     def get_confrim_url(self, user_id: int):
-      return 'http://localhost:8008/verify-email/%s' % signing.dumps(user_id)
+        confirm_key = signing.dumps(user_id)
+
+        return f'{settings.FRONTEND_URL}/verify-email/?confirm_key={confirm_key}'
+
 
 def full_logout(request):
     response = Response({"detail": _("Successfully logged out.")}, status=status.HTTP_200_OK)
