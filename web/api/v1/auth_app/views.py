@@ -1,7 +1,5 @@
 from dj_rest_auth import views as auth_views
 from django.contrib.auth import logout as django_logout
-from django.core import signing
-from django.core.mail import send_mail
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
@@ -9,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from . import serializers
-from .services import AuthAppService, full_logout
+from .services import AuthAppService, full_logout, PasswordResetService
 from main.tasks import send_information_email
 
 
@@ -59,6 +57,11 @@ class PasswordResetView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        service = PasswordResetService()
+
+        service.reset_password(email=serializer.validated_data['email'])
+
         return Response(
             {'detail': _('Password reset e-mail has been sent.')},
             status=status.HTTP_200_OK,
@@ -72,6 +75,11 @@ class PasswordResetConfirmView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        service = PasswordResetService()
+
+        service.reset_confirm(serializer.validated_data)
+
         return Response(
             {'detail': _('Password has been reset with the new password.')},
             status=status.HTTP_200_OK,
