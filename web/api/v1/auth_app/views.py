@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from . import serializers
-from .services import AuthAppService, full_logout, PasswordResetService
+from .services import AuthAppService, PasswordResetService, full_logout
 from main.tasks import send_information_email
 
 

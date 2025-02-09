@@ -6,20 +6,20 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core import signing
 from django.db import transaction
-from django.utils.translation import gettext_lazy as _
 from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
-from rest_framework.exceptions import ValidationError, NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.email_services import BaseEmailHandler
+from api.v1.auth_app.types import PasswordResetDTO
 
 from main.decorators import except_shell
 from main.tasks import send_information_email
-from api.v1.auth_app.types import PasswordResetDTO
 
 if TYPE_CHECKING:
     from main.models import UserType
@@ -107,6 +107,7 @@ class AuthAppService:
 
         return f'{settings.FRONTEND_URL}/verify-email/?confirm_key={confirm_key}'
 
+
 class PasswordResetGenerator:
     def __init__(self):
         self.token_generator = default_token_generator
@@ -128,6 +129,7 @@ class PasswordResetGenerator:
         except (User.DoesNotExist, ValueError):
             return None
 
+
 class PasswordResetService:
     def _get_reset_url(self, user: 'UserType'):
         generator = PasswordResetGenerator().encode(user)
@@ -148,22 +150,21 @@ class PasswordResetService:
         )
 
     def reset_confirm(self, validated_data: dict):
-        user = PasswordResetGenerator().get_user_by_uid(validated_data['uid'])
+        reset_generator = PasswordResetGenerator()
+
+        user = reset_generator.get_user_by_uid(validated_data['uid'])
 
         if not user:
             raise NotFound('user does not exists', code='user_does_not_exists')
 
-        token_valid = PasswordResetGenerator().check_token(user, validated_data['token'])
+        token_valid = reset_generator.check_token(user, validated_data['token'])
 
         if not token_valid:
-            raise ValidationError('token is not valid', code='token_is_not_valid')
+            raise ValidationError({'token': 'token is not valid'}, code='token_is_not_valid')
 
         user.set_password(validated_data['password_1'])
 
         user.save(update_fields=['password'])
-
-
-
 
 
 def full_logout(request):
