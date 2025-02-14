@@ -73,6 +73,19 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     uid = serializers.CharField()
     token = serializers.CharField()
 
+    def validate_password_1(self, password: str):
+        validate_password(password)
+
+        return password
+
+    def validate(self, data: dict):
+        if data['password_1'] != data['password_2']:
+            raise serializers.ValidationError(
+                {'password_2': error_messages['password_not_match']}, code='password_not_match'
+            )
+
+        return data
+
 
 class VerifyEmailSerializer(serializers.Serializer):
     key = serializers.CharField()
