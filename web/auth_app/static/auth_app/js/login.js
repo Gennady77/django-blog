@@ -2,6 +2,10 @@ $(function () {
   $('#loginForm').submit(login);
 });
 
+$(function () {
+  $('#forgotPasswordForm').submit(forgotPassword);
+});
+
 function login(e) {
   let form = $(this);
   e.preventDefault();
@@ -23,4 +27,33 @@ function login(e) {
 
     }
   })
+}
+
+function forgotPassword(e) {
+  e.preventDefault();
+
+  const form = $(this);
+
+  $.ajax({
+    url: form.attr('action'),
+    type: 'POST',
+    dataType: 'json',
+    data: form.serialize(),
+    success: function() {
+      $('#pwdModal').modal('hide');
+
+      alert('Success! An email confirming the password change was sent to the specified email address. Follow the instructions.');
+    },
+    error: function(data) {
+      let text = 'Server error.';
+
+      switch (data.status) {
+        case 404:
+          text = 'There is no user with such an email.';
+        break;
+      }
+
+      alert(`Error! ${text}`);
+    }
+  });
 }
