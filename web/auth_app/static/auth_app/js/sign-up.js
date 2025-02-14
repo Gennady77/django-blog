@@ -1,4 +1,3 @@
-console.log('sing-up')
 $(function () {
   $('#signUpForm').submit(singUp);
 });
@@ -18,5 +17,5 @@ function singUp(e) {
     error: function (data) {
       console.error(data);
     }
-	});
+  });
 }
