@@ -25,23 +25,31 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ('id', 'name', 'slug')
 
-
-class ArticleSerializer(serializers.ModelSerializer):
-    url = serializers.CharField(source='get_absolute_url')
+class ArticleListSerializer(serializers.ModelSerializer):
     author = UserSerializer()
     category = CategorySerializer()
-    comments_count = serializers.IntegerField()
 
     class Meta:
         model = Article
-        fields = ('title', 'url', 'author', 'category', 'created', 'updated', 'comments_count')
+        fields = ('id', 'author', 'title', 'image', 'created', 'category')
 
 
-class FullArticleSerializer(ArticleSerializer):
-    comments = CommentSerializer(source='comment_set', many=True)
-
-    class Meta(ArticleSerializer.Meta):
-        fields = ArticleSerializer.Meta.fields + (
-            'content',
-            'comments',
-        )
+# class ArticleSerializer(serializers.ModelSerializer):
+#     url = serializers.CharField(source='get_absolute_url')
+#     author = UserSerializer()
+#     category = CategorySerializer()
+#     comments_count = serializers.IntegerField()
+#
+#     class Meta:
+#         model = Article
+#         fields = ('title', 'url', 'author', 'category', 'created', 'updated', 'comments_count')
+#
+#
+# class FullArticleSerializer(ArticleSerializer):
+#     comments = CommentSerializer(source='comment_set', many=True)
+#
+#     class Meta(ArticleSerializer.Meta):
+#         fields = ArticleSerializer.Meta.fields + (
+#             'content',
+#             'comments',
+#         )
