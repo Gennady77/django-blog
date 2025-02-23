@@ -19,7 +19,12 @@ function submit(e) {
     url: form.attr('action'),
     type: 'POST',
     dataType: 'json',
-    data: `${form.serialize()}&${urlSearchParams.toString()}`,
+    data: {
+      uid: urlSearchParams.get('uid'),
+      token: urlSearchParams.get('token'),
+      password_1: this.elements.password_1.value,
+      password_2: this.elements.password_2.value,
+    },
     success: function (data) {
       alert('Success! Password was updated. You can login with new credentials.');
     },
