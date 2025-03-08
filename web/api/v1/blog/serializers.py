@@ -31,7 +31,7 @@ class ArticleListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Article
-        fields = ('id', 'author', 'title', 'image', 'created', 'category')
+        fields = ('id', 'author', 'title', 'image', 'created', 'category', 'updated', 'content')
 
 
 # class ArticleSerializer(serializers.ModelSerializer):
