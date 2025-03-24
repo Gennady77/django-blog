@@ -11,8 +11,11 @@ pytestmark = [pytest.mark.django_db]
 PASSWORD_RESET_URL = reverse_lazy('api:v1:auth_app:reset-password')
 
 
-def test_password_reset_success(client: Client, user):
-    data = {'email': 'harley.quinn@email.com'}
+def test_password_reset_success(client: Client, user, mock_recaptcha):
+    data = {
+        'email': 'harley.quinn@email.com',
+        'g_recaptcha_response': 'qwqwqwqwqwqwqwqw',
+    }
 
     response = client.post(PASSWORD_RESET_URL, data)
 
@@ -29,8 +32,11 @@ def test_password_reset_incorrect_email(client: Client):
     assert len(mail.outbox) == 0
 
 
-def test_password_reset_nonexistent_email(client: Client):
-    data = {'email': 'bob.marley@email.com'}
+def test_password_reset_nonexistent_email(client: Client, mock_recaptcha):
+    data = {
+        'email': 'bob.marley@email.com',
+        'g_recaptcha_response': 'qwqwqwqwqwqwqwqw',
+    }
 
     response = client.post(PASSWORD_RESET_URL, data)
 

@@ -19,8 +19,12 @@ class SignUpView(GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        userDataFieldName = ['first_name', 'last_name', 'email', 'password_1', 'password_2']
+
+        validated_data = {key: serializer.validated_data[key] for key in userDataFieldName}
+
         service = AuthAppService()
-        user = service.create_user(serializer.validated_data)
+        user = service.create_user(validated_data)
 
         send_information_email(
             subject='Confirm your email',
