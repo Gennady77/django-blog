@@ -1,9 +1,15 @@
+import json
+from urllib.parse import urlencode
+from urllib.request import urlopen
+
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from api.v1.auth_app.services import AuthAppService
+from main.mixins import ReCaptchaMixin
+from main.validators import validate_recaptcha
 
 User = get_user_model()
 
@@ -16,7 +22,7 @@ error_messages = {
 }
 
 
-class UserSignUpSerializer(serializers.Serializer):
+class UserSignUpSerializer(serializers.Serializer, ReCaptchaMixin):
     first_name = serializers.CharField(min_length=2, max_length=100)
     last_name = serializers.CharField(min_length=2, max_length=100)
     email = serializers.EmailField()
@@ -38,7 +44,7 @@ class UserSignUpSerializer(serializers.Serializer):
         return data
 
 
-class LoginSerializer(serializers.Serializer):
+class LoginSerializer(serializers.Serializer, ReCaptchaMixin):
     email = serializers.EmailField()
     password = serializers.CharField()
 
@@ -63,9 +69,8 @@ class LoginSerializer(serializers.Serializer):
         return data
 
 
-class PasswordResetSerializer(serializers.Serializer):
+class PasswordResetSerializer(serializers.Serializer, ReCaptchaMixin):
     email = serializers.EmailField()
-
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     password_1 = serializers.CharField(min_length=8, max_length=64)

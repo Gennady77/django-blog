@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.core import mail
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -28,13 +30,15 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data[required_key][0].code, 'required')
 
-    def test_with_correct_data(self):
+    @patch('main.mixins.validate_recaptcha', return_value={'success': True})
+    def test_with_correct_data(self, validate_recaptcha):
         correctPostData = {
             'first_name': 'TestName',
             'last_name': 'TestLastName',
             'email': 'test.email@asd.com',
             'password_1': '12345',
             'password_2': '12345',
+            'g_recaptcha_response': 'qwqwqwqwqwqwqwqw',
         }
 
         response = self.client.post(
@@ -80,13 +84,15 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['email'][0].code, 'invalid')
 
-    def test_pass1_pass2(self):
+    @patch('main.mixins.validate_recaptcha', return_value={'success': True})
+    def test_pass1_pass2(self, mock_validate_recaptcha):
         correctPostData = {
             'first_name': 'TestName',
             'last_name': 'TestLastName',
             'email': 'test.email@asd.com',
             'password_1': '12345',
             'password_2': '67890',
+            'g_recaptcha_response': 'qwqwqwqwqwqwqwqw',
         }
 
         response = self.client.post(

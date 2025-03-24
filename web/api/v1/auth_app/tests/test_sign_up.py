@@ -13,13 +13,14 @@ SIGN_UP_URL = reverse_lazy('api:v1:auth_app:sign-up')
 VERIFY_EMAIL_URL = reverse_lazy('api:v1:auth_app:sign-up-verify')
 
 
-def test_sign_up(client: Client):
+def test_sign_up(client: Client, mock_recaptcha):
     correctPostData = {
         'first_name': 'Jack',
         'last_name': 'Nicholson',
         'email': 'jack.nicholson@asd.com',
         'password_1': '12345',
         'password_2': '12345',
+        'g_recaptcha_response': 'qwqwqwqwqwqwqwqw',
     }
 
     client.post(SIGN_UP_URL, correctPostData)

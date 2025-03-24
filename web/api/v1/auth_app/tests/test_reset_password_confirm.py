@@ -11,7 +11,7 @@ RESET_CONFIRM_URL = reverse('api:v1:auth_app:reset-password-confirm')
 LOGIN_URL = reverse('api:v1:auth_app:sign-in')
 
 
-def test_reset_confirm_succeful(client: Client, user_uid_token):
+def test_reset_confirm_succeful(client: Client, user_uid_token, mock_recaptcha):
     data = {
         'password_1': '123456789',
         'password_2': '123456789',
@@ -23,7 +23,11 @@ def test_reset_confirm_succeful(client: Client, user_uid_token):
 
     assert response.status_code == status.HTTP_200_OK
 
-    login_response = client.post(LOGIN_URL, {'email': 'harley.quinn@email.com', 'password': '123456789'})
+    login_response = client.post(LOGIN_URL, {
+        'email': 'harley.quinn@email.com',
+        'password': '123456789',
+        'g_recaptcha_response': 'qwqwqwqwqwqwqwqw'
+    })
 
     assert login_response.status_code == status.HTTP_200_OK
 
