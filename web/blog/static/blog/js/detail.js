@@ -1,9 +1,11 @@
 $(function () {
   const container = $('#article');
   const searchParams = new URLSearchParams(window.location.search);
+  const matches = window.location.pathname.match(/^\/blog\/(\d+)$/i);
+  const blogId = matches[1];
 
   $.ajax({
-    url: `/api/v1/article/detail/${searchParams.get('id')}/`,
+    url: `/api/v1/article/detail/${blogId}/`,
     type: 'GET',
     dataType: 'json',
     success: (data) => {

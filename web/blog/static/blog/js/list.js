@@ -6,15 +6,9 @@ $(function () {
     success: (data) => {
       const listContainer = $('#blogList');
 
-      if (data.results) {
-        data.results.forEach((article) => {
-          listContainer.append(renderArticle(article));
-        });
-      }
+      listContainer.append(data.results.map((article) => renderArticle(article)).join(''));
 
       updatePaginator(data);
-
-      console.log(data);
     },
     error: () => {
       window.alert('Ошибка при загрузке статей');
@@ -32,15 +26,9 @@ function navigatePage(pageNumber) {
     success: (data) => {
       const listContainer = $('#blogList').empty();
 
-      if (data.results) {
-        data.results.forEach((article) => {
-          listContainer.append(renderArticle(article));
-        });
-      }
+      listContainer.append(data.results.map((article) => renderArticle(article)).join(''));
 
       updatePaginator(data, pageNumber);
-
-      console.log(data);
     },
     error: () => {
       window.alert('Ошибка при загрузке статей');
@@ -91,14 +79,14 @@ function updatePaginator(data, currentPage = 1) {
 }
 
 function renderArticle(article) {
-  return $(`
+  return `
     <div class="row">
       <div class="col-md-12 post">
         <div class="row">
           <div class="col-md-12">
             <h4>
               <strong>
-                <a href="/blog/detail/?id=${article.id}" class="post-title">${ article.title }</a>
+                <a href="/blog/${article.id}" class="post-title">${ article.title }</a>
               </strong>
             </h4>
           </div>
@@ -126,15 +114,15 @@ function renderArticle(article) {
           </div>
           <div class="col-md-9">
             <p>
-              ${article .content}
+              ${article.short_content}
             </p>
             <p>
-              <a class="btn btn-read-more" href="/blog/detail/?id=${article.id}">Read more</a>
+              <a class="btn btn-read-more" href="/blog/${article.id}">Read more</a>
             </p>
           </div>
         </div>
       </div>
     </div>
-  `);
+  `;
 }
 

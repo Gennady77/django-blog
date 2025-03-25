@@ -1,3 +1,6 @@
+import re
+import textwrap
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -28,10 +31,14 @@ class CategorySerializer(serializers.ModelSerializer):
 class ArticleListSerializer(serializers.ModelSerializer):
     author = UserSerializer()
     category = CategorySerializer()
+    short_content = serializers.SerializerMethodField(method_name='get_short_content')
+
+    def get_short_content(self, obj: Article):
+        return textwrap.shorten(re.sub(r'<.*?>', '', obj.content), 200)
 
     class Meta:
         model = Article
-        fields = ('id', 'author', 'title', 'image', 'created', 'category', 'updated', 'content')
+        fields = ('id', 'author', 'title', 'image', 'created', 'category', 'updated', 'content', 'short_content')
 
 
 # class ArticleSerializer(serializers.ModelSerializer):
