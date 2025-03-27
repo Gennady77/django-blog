@@ -34,6 +34,9 @@ def send_information_email(
     :param letter_language: translate letter to selected lang
     :param kwargs: from_email, bcc, cc, reply_to and file_path params
     """
+
+    print('!!!!!!!!!!!!!!!!!!!!!!!@@@@@@@@@@@')
+
     activate(letter_language)
     _to_email: list[str] = [to_email] if isinstance(to_email, str) else to_email
     html_email: str = loader.render_to_string(template_name, context)

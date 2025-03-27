@@ -142,12 +142,19 @@ class PasswordResetService:
         if not user:
             raise NotFound('user does not exists', code='user_does_not_exists')
 
-        send_information_email(
-            subject='Reset password',
-            template_name='emails/reset_password.html',
-            context={'name': user.full_name, 'reset_password_url': self._get_reset_url(user)},
-            to_email=user.email,
-        )
+        # send_information_email.delay(
+        #     subject='Reset password',
+        #     template_name='emails/reset_password.html',
+        #     context={'name': user.full_name, 'reset_password_url': self._get_reset_url(user)},
+        #     to_email=user.email,
+        # )
+
+        send_information_email.apply_async(kwargs = dict (
+            subject = 'Reset password',
+            template_name = 'emails/reset_password.html',
+            context = {'name': user.full_name, 'reset_password_url': self._get_reset_url(user)},
+            to_email = user.email,
+        ))
 
     def reset_confirm(self, validated_data: dict):
         reset_generator = PasswordResetGenerator()
