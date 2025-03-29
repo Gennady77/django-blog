@@ -17,7 +17,7 @@ class BlogService:
 
 class ArticleQueryService:
     def article_list(self) -> QuerySet[Article]:
-        return Article.objects.all().select_related('author', 'category')
+        return Article.objects.all().annotate(comments_count = Count('comment_set')).select_related('author', 'category')
 
     def article_detail(self, id: Number) -> QuerySet[Article]:
         return Article.objects.get(id=id)
