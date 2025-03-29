@@ -95,7 +95,7 @@ function renderArticle(article) {
           <div class="col-md-12 post-header-line">
             <span class="glyphicon glyphicon-user"></span>by <a href="#">${ article.author.full_name }</a> |
             <span class="glyphicon glyphicon-calendar"></span> ${ dayjs(article.updated).format('DD-MM-YYYY HH:mm') } |
-            <span class="glyphicon glyphicon-comment"></span><a href="#">{{ article.comments_count }} Comments</a> |
+            <span class="glyphicon glyphicon-comment"></span><a href="#">${ article.comments_count } Comments</a> |
             <i class="icon-share"></i><a href="#">39 Shares</a> |
             <span class="glyphicon glyphicon-tags"></span> Tags: <a href="#">
             <span class="label label-info">Snipp</span></a> <a href="#">
