@@ -31,6 +31,9 @@ ENABLE_DEBUG_TOOLBAR = int(os.environ.get('ENABLE_DEBUG_TOOLBAR', 0))
 
 INTERNAL_IPS: list[str] = []
 
+G_RECAPTCHA_SITE_KEY = os.environ.get('G_RECAPTCHA_SITE_KEY')
+G_RECAPTCHA_SECRET_KEY = os.environ.get('G_RECAPTCHA_SECRET_KEY')
+
 ADMIN_URL = os.environ.get('ADMIN_URL', 'admin')
 
 SWAGGER_URL = os.environ.get('SWAGGER_URL')

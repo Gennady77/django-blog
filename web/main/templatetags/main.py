@@ -10,6 +10,10 @@ register = template.Library()
 def project_title() -> str:
     return settings.PROJECT_TITLE
 
+@register.simple_tag
+def g_recaptcha_site_key():
+    return settings.G_RECAPTCHA_SITE_KEY
+
 
 @register.simple_tag
 def github_link():
