@@ -2,6 +2,7 @@ import re
 import textwrap
 
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from rest_framework import serializers
 
 from blog.models import Article, Category, Comment
@@ -32,13 +33,14 @@ class ArticleListSerializer(serializers.ModelSerializer):
     author = UserSerializer()
     category = CategorySerializer()
     short_content = serializers.SerializerMethodField(method_name='get_short_content')
+    comments_count = serializers.IntegerField()
 
     def get_short_content(self, obj: Article):
         return textwrap.shorten(re.sub(r'<.*?>', '', obj.content), 200)
 
     class Meta:
         model = Article
-        fields = ('id', 'author', 'title', 'image', 'created', 'category', 'updated', 'content', 'short_content')
+        fields = ('id', 'author', 'title', 'image', 'created', 'category', 'updated', 'content', 'short_content', 'comments_count')
 
 
 # class ArticleSerializer(serializers.ModelSerializer):
