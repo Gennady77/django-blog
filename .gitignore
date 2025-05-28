@@ -15,6 +15,7 @@ celerybeat*
 .coverage
 .cache
 web/media/*
+!web/media/no-avatar.png
 htmlcov
 venv
 backup
@@ -28,3 +29,4 @@ db.sqlite3
 modules.txt
 .secrets.env
 .DS_Store
+.secret.env

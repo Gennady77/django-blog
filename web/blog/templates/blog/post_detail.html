@@ -32,9 +32,19 @@
     <div class="g-plusone" data-annotation="inline" data-width="300" data-href=""></div>
 
     <br/>
-    <hr>
-    <!-- the comment box -->
-    {% include 'blog/includes/comments.html' %}
+    {% if user.is_authenticated %}
+      <hr>
+      <!-- the comment box -->
+      {% include 'blog/includes/comment_box.html' %}
+      <hr>
+    {% endif %}
+    <div class="row">
+      <div class="comments-container">
+        <h1 id="commentCount">Comments (0)</h1>
+        <ul id="paginationComment" class="comments-list" data-id="{{ id }}" data-href-next="#">
+        </ul>
+      </div>
+    </div>
   </div>
 
   {% block right_sidebar %}

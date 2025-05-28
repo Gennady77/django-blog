@@ -9,10 +9,20 @@ from .managers import UserManager
 
 UserType = TypeVar('UserType', bound='User')
 
+def avatar_upload_path(obj: UserType, file_name: str):
+    return f'avatars/{obj.id}/{file_name}'
+
+class Gender(models.IntegerChoices):
+    NOT_KNOWN = 0
+    MALE = 1
+    FEMALE = 2
 
 class User(AbstractUser):
     username = None  # type: ignore
     email = models.EmailField(_('Email address'), unique=True)
+    avatar = models.ImageField(blank=True, upload_to=avatar_upload_path, default='no-avatar.png')
+    birthday = models.DateField(null=True, blank=True)
+    gender = models.SmallIntegerField(choices=Gender.choices, default=Gender.NOT_KNOWN)
 
     USERNAME_FIELD: str = 'email'
     REQUIRED_FIELDS: list[str] = []

@@ -16,7 +16,7 @@ ul {
 }
 
 .comments-container {
-	margin: 60px auto 15px;
+	margin: 20px auto 15px;
 	width: 768px;
 }
 
@@ -94,6 +94,23 @@ ul {
 	clear: both;
 	margin-top: 15px;
 }
+
+.replyForm {
+  display: flex;
+  align-item: center;
+  gap: 10px;
+  padding-left: 88px;
+  margin-top: 15px;
+}
+
+.replyForm content {
+  flex: auto;
+}
+
+.replyForm .btn {
+  flex: none;
+}
+
 /**
  * Avatar
  ---------------------------*/
@@ -172,10 +189,17 @@ ul {
 	-webkit-border-radius: 4px 4px 0 0;
 	-moz-border-radius: 4px 4px 0 0;
 	border-radius: 4px 4px 0 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.comment-head-info {
+  display: flex;
+	align-items: baseline;
 }
 
 .comment-box .comment-head i {
-	float: right;
 	margin-left: 14px;
 	position: relative;
 	top: 2px;
@@ -232,6 +256,12 @@ ul {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
+}
+
+.comment .moreReplies {
+  color: #03658c;
+  margin-left: 160px;
+  cursor: pointer;
 }
 
 /** =====================

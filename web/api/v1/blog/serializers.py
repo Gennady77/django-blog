@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count
 from rest_framework import serializers
 
+from api.v1.blog.services import ArticleQueryService
 from blog.models import Article, Category, Comment
 
 User = get_user_model()
@@ -17,9 +18,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
     class Meta:
         model = Comment
-        fields = ('id', 'user', 'author', 'content', 'updated')
+        fields = ('id', 'user', 'content', 'parent', 'created')
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -41,6 +44,30 @@ class ArticleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = ('id', 'author', 'title', 'image', 'created', 'category', 'updated', 'content', 'short_content', 'comments_count')
+
+
+
+class CommentPostSerializer(serializers.Serializer):
+    content = serializers.CharField(max_length=200, required=True)
+    article = serializers.IntegerField(required=True)
+    parent = serializers.IntegerField(required=False)
+
+    def validate_article(self, article_id):
+        if not ArticleQueryService.is_article_exists(article_id):
+            raise serializers.ValidationError(code='article_not_found')
+
+        return article_id
+
+class CommentListSerializer(serializers.Serializer):
+    article = serializers.IntegerField(required=True)
+
+class CommentResponseSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    children = CommentSerializer(many=True)
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'content', 'user', 'created', 'parent', 'children')
 
 
 # class ArticleSerializer(serializers.ModelSerializer):
