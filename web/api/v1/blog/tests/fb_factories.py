@@ -1,6 +1,6 @@
 import factory
 
-from blog.models import Article, Category
+from blog.models import Article, Category, Comment
 from main.models import User
 
 
@@ -26,3 +26,11 @@ class ArticleFactory(factory.django.DjangoModelFactory):
     title = factory.Faker('sentence', nb_words = 7)
     content = factory.Faker('text')
     author = factory.SubFactory(UserFactory)
+
+class CommentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Comment
+
+    user = factory.SubFactory(UserFactory)
+    content = factory.Faker("text", max_nb_chars=190)
+    article = factory.SubFactory(ArticleFactory)

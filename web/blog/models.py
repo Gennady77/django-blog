@@ -57,13 +57,16 @@ class Article(models.Model):
         verbose_name = _('Article')
         verbose_name_plural = _('Articles')
         ordering = ('-updated', '-created', 'id')
+        permissions=(
+            ('add_articles', 'can add articles'),
+        )
 
 
 class Comment(models.Model):
-    author = models.EmailField()
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='comment_set', blank=True)
     content = models.TextField(max_length=200)
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comment_set')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
