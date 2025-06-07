@@ -16,8 +16,8 @@ class ProfileAvatarSerializer(serializers.Serializer):
     avatar = serializers.FileField()
 
     def validate_avatar(self, avatar: 'InMemoryUploadedFile'):
-        if avatar.content_type not in ['image/png']:
-            raise serializers.ValidationError(code='unsupported image extension')
+        if avatar.content_type not in ['image/png', 'image/jpeg']:
+            raise serializers.ValidationError(code='unsupported_image_extension')
 
         return avatar
 

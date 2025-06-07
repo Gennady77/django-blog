@@ -6,6 +6,7 @@ from rest_framework.parsers import MultiPartParser
 from sentry_sdk.integrations.beam import raise_exception
 
 from . import serializers
+from .services import AvatarService
 
 
 class ProfileView(GenericAPIView):
@@ -28,5 +29,9 @@ class ProfileAvatarView(GenericAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        service = AvatarService()
+
+        service.save(request.user, serializer.validated_data['avatar'])
 
         return Response(status=status.HTTP_200_OK)
